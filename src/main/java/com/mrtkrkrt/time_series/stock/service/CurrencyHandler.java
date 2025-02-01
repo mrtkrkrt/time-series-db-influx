@@ -40,12 +40,13 @@ public class CurrencyHandler {
         String fluxQuery = "from(bucket: \"" + "mybucket" + "\")\n" +
                 "  |> range(start: -5m)\n" +
                 "  |> filter(fn: (r) => r._measurement == \"exchange_rate\" and r.currency == \"EUR\")\n" +
-                "  |> filter(fn: (r) => r._field == \"rate\")";
+                "  |> filter(fn: (r) => r._field == \"rate\" or r._field == \"time\")";
 
         List<FluxTable> tables = queryApi.query(fluxQuery);
         List<BigDecimal> prices = new ArrayList<>();
         for (FluxTable table : tables) {
             for (FluxRecord record : table.getRecords()) {
+                String field = record.getField();
                 System.out.println("Time: " + record.getTime() +
                         ", Currency: " + record.getValueByKey("currency") +
                         ", Rate: " + record.getValue());
